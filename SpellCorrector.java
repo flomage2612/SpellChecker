@@ -16,8 +16,8 @@ public class SpellCorrector {
     {
         this.cr = cr;
         this.cmr = cmr;
-        lambda = 5;
-        NO_ERROR = -15.0;
+        lambda = 3;
+        NO_ERROR = -13;
     }
     
     public String correctPhrase(String phrase)
@@ -34,18 +34,34 @@ public class SpellCorrector {
         {
             if(!cr.inVocabulary(words[i]))
                 p.add(i);
-            else if (i == 0 && !p.contains(i-1))
+            else if (i == 0)
             {
                 double prob = cr.getSmoothedCount(words[i]);
                 if(prob < -15.0)
                     p.add(i);
             }
-                
+        }
+        for(int i = 0; i < words.length; i ++)
+        {
+            if(i == 0)
+            {
+                double prob2 = cr.getSmoothedCount(words[i]+" "+words[i+1]);
+                if(prob2 < NO_ERROR && !p.contains(i+1))
+                    p.add(i);
+            }
+            else if(i == words.length-1 )
+            {
+                double prob1 = cr.getSmoothedCount(words[i-1]+" "+words[i]);
+                if((prob1 < NO_ERROR && !p.contains(i-1)))
+                    p.add(i);
+            }
             else
             {
-                double prob = cr.getSmoothedCount(words[i-1]+" "+words[i]);
+                double prob1 = cr.getSmoothedCount(words[i-1]+" "+words[i]);
+                double prob2 = cr.getSmoothedCount(words[i]+" "+words[i+1]);
                 //System.out.println(words[i-1]+" "+words[i] + " "+ prob);
-                if(prob < NO_ERROR && !p.contains(i-1))
+                if((prob1 < NO_ERROR && !p.contains(i-1)) || ( prob2 < NO_ERROR && 
+                        !p.contains(i+1)))
                     p.add(i);
             }
                 
@@ -81,7 +97,7 @@ public class SpellCorrector {
                     }
                       
                     //System.out.println(s+" "+P1+" "+P2+" "+P3);
-                    totP = 0.5*P1+0.5*P2+0.15*P3;
+                    totP = 0.5*P1+0.5*P2+0.25*P3;
                 }
                 else if(i == 0)
                 {
