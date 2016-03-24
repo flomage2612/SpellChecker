@@ -16,8 +16,8 @@ public class SpellCorrector {
     {
         this.cr = cr;
         this.cmr = cmr;
-        lambda = 8;
-        NO_ERROR = 0.0;
+        lambda = 5;
+        NO_ERROR = -15.0;
     }
     
     public String correctPhrase(String phrase)
@@ -34,17 +34,18 @@ public class SpellCorrector {
         {
             if(!cr.inVocabulary(words[i]))
                 p.add(i);
-            else if (i == 0)
+            else if (i == 0 && !p.contains(i-1))
             {
                 double prob = cr.getSmoothedCount(words[i]);
-                if(prob < 1.0)
+                if(prob < -15.0)
                     p.add(i);
             }
                 
             else
             {
                 double prob = cr.getSmoothedCount(words[i-1]+" "+words[i]);
-                if(prob < NO_ERROR)
+                //System.out.println(words[i-1]+" "+words[i] + " "+ prob);
+                if(prob < NO_ERROR && !p.contains(i-1))
                     p.add(i);
             }
                 
@@ -59,7 +60,7 @@ public class SpellCorrector {
             Map<String, Double> possibilities = this.getCandidateWords(words[i]);
             
             
-            double maxP = -20;
+            double maxP = -200;
             //double pErr1 = cr.getSmoothedCount(words[i-1]+" "+words[i]);
             //double pErr2 = cr.getSmoothedCount(words[i]+" "+words[i+1]);
             for(String s : possibilities.keySet())
@@ -67,18 +68,20 @@ public class SpellCorrector {
                 double P1, P2, totP;
                 double P3 = possibilities.get(s);
                 
-                
                 if(i > 0 && i < words.length-1)
                 {
+                    
                     P1 = cr.getSmoothedCount(words[i-1]+" "+s);
                     P2 = cr.getSmoothedCount(s+" "+words[i+1]);
+                    
                     if(P1 > NO_ERROR && P2 > NO_ERROR)
                     {
-                        P1 *= 1.5;
-                        P2 *= 1.5;
+                        P1 *= 3;
+                        P2 *= 3;
                     }
-                        
-                    totP = 0.4*P1+0.4*P2+0.5*P3;
+                      
+                    //System.out.println(s+" "+P1+" "+P2+" "+P3);
+                    totP = 0.5*P1+0.5*P2+0.15*P3;
                 }
                 else if(i == 0)
                 {
@@ -138,9 +141,9 @@ public class SpellCorrector {
                     {
                         nbErr = 1;
                     }
-                    double pErr = -Math.log(nbErr)
-                            -Math.log( Math.pow(cr.getSmoothedCount(new_word), lambda))
-                            +Math.log((double)cr.countChar(wi));
+                    double pErr = (Math.log(nbErr)-Math.log((double)cr.countChar(wi)))
+                            +lambda * (cr.getSmoothedCount(new_word));
+                            
 
                     mapOfWords.put(new_word, pErr);
                 }
@@ -156,9 +159,9 @@ public class SpellCorrector {
                     {
                         nbErr = 1;
                     }
-                    double pErr = -Math.log(nbErr)
-                            -Math.log( Math.pow(cr.getSmoothedCount(new String(word_tab)), lambda))
-                            +Math.log((double)cr.countChar(wi));
+                    double pErr = (Math.log(nbErr)-Math.log((double)cr.countChar(wi)))
+                            +lambda * ( cr.getSmoothedCount(new String(word_tab)));
+                            
                    
                     mapOfWords.put(new String(word_tab), pErr);
                 }
@@ -173,14 +176,18 @@ public class SpellCorrector {
             if(cr.inVocabulary(del_word))
             {
                 double nbErr = (double)cmr.getConfusionCount(String.valueOf(wim1), String.valueOf(wim1)+String.valueOf(wi));
+                if(wim1 == ' ')
+                    nbErr = (double)cmr.getConfusionCount("1", String.valueOf(wi));
                 if(nbErr == 0 )
                 {
                     nbErr = 1;
                 }
-                double pErr = -Math.log(nbErr)
-                        -Math.log( Math.pow(cr.getSmoothedCount(del_word), lambda))
-                        +Math.log((double)cr.countChar(wim1,wi));
                 
+                double pErr = (Math.log(nbErr)-Math.log((double)cr.countChar(wim1,wi)))
+                        +lambda*(cr.getSmoothedCount(del_word));
+                if(wim1 == ' ')      
+                     pErr = (Math.log(nbErr)-Math.log((double)cr.countChar(wi)))
+                        +lambda*(cr.getSmoothedCount(del_word));
                 mapOfWords.put(del_word, pErr);
             }
                 
@@ -198,9 +205,8 @@ public class SpellCorrector {
                 {
                     nbErr = 1;
                 }
-                double pErr = -Math.log(nbErr)
-                        -Math.log( Math.pow(cr.getSmoothedCount(trans_word), lambda))
-                        +Math.log((double)cr.countChar(wim1,wi));
+                double pErr = (Math.log(nbErr)-Math.log((double)cr.countChar(wim1,wi)))
+                        +lambda*cr.getSmoothedCount(trans_word);
                 mapOfWords.put(trans_word, pErr);
             }
            

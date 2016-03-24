@@ -128,14 +128,14 @@ public class CorpusReader
         if(!NGram.contains(" "))
         {
             // add-k smoothing for unigram
-            return -Math.log((this.getNGramCount(NGram) + k))+Math.log(nbWords+k*this.getVocabularySize());
+            return Math.log((this.getNGramCount(NGram) + k))-Math.log(nbWords+k*this.getVocabularySize());
         }
         
         String[] words = NGram.split(" ");
         if(words.length != 2) System.err.println("only bigrams are handled");
         
-        smoothedCount = -Math.log(this.getNGramCount(NGram) + l * this.getSmoothedCount(words[1]))
-                +Math.log(this.getNGramCount(words[0])+l);
+        // add-k smoothing
+        smoothedCount = Math.log(this.getNGramCount(NGram)+k)- Math.log(nbWords+ k *this.getVocabularySize());
         
         
         return smoothedCount;        
