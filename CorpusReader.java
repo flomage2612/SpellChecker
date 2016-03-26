@@ -23,8 +23,7 @@ public class CorpusReader
         nbWords = 0;
         readNGrams();
         readVocabulary();
-        l = 5;
-        k = 5;
+        k = 2;
     }
     
     /**
@@ -161,6 +160,19 @@ public class CorpusReader
         for(String p : vocabulary)
         {   
             if(p.contains(xy))
+                result += this.getNGramCount(p);
+        }
+        
+        return result;
+    }
+    
+    public int countFirstChar(char x)
+    {
+        int result = 0;
+        String xy = String.valueOf(x);
+        for(String p : vocabulary)
+        {   
+            if(p.startsWith(xy))
                 result += this.getNGramCount(p);
         }
         
