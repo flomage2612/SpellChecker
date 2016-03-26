@@ -43,27 +43,29 @@ public class SpellCorrector {
         }
         for(int i = 0; i < words.length; i ++)
         {
+            double prob1, prob2;
             if(i == 0)
             {
-                double prob2 = cr.getSmoothedCount(words[i]+" "+words[i+1]);
-                if(prob2 < NO_ERROR && !p.contains(i+1))
-                    p.add(i);
+                prob1 = cr.getSmoothedCount("SoS"+" "+words[i]);
+                prob2 = cr.getSmoothedCount(words[i]+" "+words[i+1]);
+                
             }
             else if(i == words.length-1 )
             {
-                double prob1 = cr.getSmoothedCount(words[i-1]+" "+words[i]);
-                if((prob1 < NO_ERROR && !p.contains(i-1)))
-                    p.add(i);
+                prob1 = cr.getSmoothedCount(words[i-1]+" "+words[i]);
+                prob2 = cr.getSmoothedCount(words[i]+" "+"EoS");
+                
             }
             else
             {
-                double prob1 = cr.getSmoothedCount(words[i-1]+" "+words[i]);
-                double prob2 = cr.getSmoothedCount(words[i]+" "+words[i+1]);
+                prob1 = cr.getSmoothedCount(words[i-1]+" "+words[i]);
+                prob2 = cr.getSmoothedCount(words[i]+" "+words[i+1]);
                 //System.out.println(words[i-1]+" "+words[i] + " "+ prob);
-                if((prob1 < NO_ERROR && !p.contains(i-1)) || ( prob2 < NO_ERROR && 
+                
+            }
+            if((prob1 < NO_ERROR && !p.contains(i-1)) || ( prob2 < NO_ERROR && 
                         !p.contains(i+1)))
                     p.add(i);
-            }
                 
         }
         
