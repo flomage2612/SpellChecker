@@ -16,7 +16,6 @@ public class CorpusReader
     private Set<String> vocabulary;
     private int nbWords;
     private int k;
-    private int l;
         
     public CorpusReader() throws IOException
     {  
@@ -135,7 +134,6 @@ public class CorpusReader
         
         // add-k smoothing
         smoothedCount = Math.log(this.getNGramCount(NGram)+k)- Math.log(nbWords+ k *this.getVocabularySize());
-        
         
         return smoothedCount;        
     }

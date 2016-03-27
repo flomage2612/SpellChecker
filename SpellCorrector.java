@@ -17,8 +17,8 @@ public class SpellCorrector {
     {
         this.cr = cr;
         this.cmr = cmr;
-        lambda = 6.5;
-        NO_ERROR = -13.075;//11125;
+        lambda = 5;
+        NO_ERROR = -13.125;
         LIKELY = -12.25;
     }
     
@@ -139,11 +139,9 @@ public class SpellCorrector {
                 if(P2 > LIKELY)
                     P2 = 0;
                 
-                totP = 4*P1+4*P2+0.6*P3;
+                totP = 4*P1+4*P2+P3;
                 
-                //if(words[i].equals("hme"))      
-                //    System.out.println("    "+s+" "+P1+" "+P2+" "+P3+ " "+totP);
-                
+                               
                 
                 
                 if(totP > maxP)
